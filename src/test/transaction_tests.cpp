@@ -3,6 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "script/interpreter.h"
 #include "test/test_pivx.h"
 
 #include "test/data/tx_invalid.json.h"
@@ -47,6 +48,7 @@ static std::map<std::string, unsigned int> mapFlagNames = {
     {std::string("DISCOURAGE_UPGRADABLE_NOPS"), (unsigned int)SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS},
     {std::string("CLEANSTACK"), (unsigned int)SCRIPT_VERIFY_CLEANSTACK},
     {std::string("CHECKLOCKTIMEVERIFY"), (unsigned int)SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY},
+    {std::string("EXCHANGEADDRVERIFY"), (unsigned int)SCRIPT_VERIFY_EXCHANGEADDR},
 };
 
 unsigned int ParseScriptFlags(std::string strFlags)
