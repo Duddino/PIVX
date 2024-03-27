@@ -634,8 +634,8 @@ jobs:
             depends/built
             depends/sdk-sources
             depends/${{ matrix.config.host }}
-            key: ${{ runner.os }}-depends-${{ matrix.config.host }}
-            restore-keys: ${{ runner.os }}-depends-${{ matrix.config.host }}
+          key: ${{ runner.os }}-depends-${{ matrix.config.host }}
+          restore-keys: ${{ runner.os }}-depends-${{ matrix.config.host }}
       - name: Run functional tests
         run: |
           if [ "${{ matrix.config.functional_tests }}" = "true" ]; then
