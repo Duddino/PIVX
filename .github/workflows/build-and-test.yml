@@ -557,7 +557,7 @@ jobs:
           ./autogen.sh
           echo ::endgroup::
 
-          mkdir build && cd build
+          mkdir -p build && cd build
 
           echo ::group::Configure
           ../configure --cache-file=config.cache $BITCOIN_CONFIG_ALL ${{ matrix.config.BITCOIN_CONFIG }} $PARAMS_FLAGS || ( cat config.log && false)
