@@ -497,7 +497,14 @@ jobs:
             .pivx-params
           key: ${{ runner.os }}-depbuild-${{ matrix.config.id }}-ccache
           restore-keys: ${{ runner.os }}-depbuilt-${{ matrix.config.id }}-ccache
-
+          
+      - name: build cache files
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+          key: ${{ runner.os }}-depbuild-${{ matrix.config.id }}-build
+          restore-keys: ${{ runner.os }}-depbuilt-${{ matrix.config.id }}-build
       - name: Build Wallet
         run: |
           export LC_ALL=C.UTF-8
@@ -612,6 +619,15 @@ jobs:
             functional_tests: true
             test_runner_extra: "--coverage --all  --exclude feature_dbcrash"
     steps:
+      - name: Get Source
+        uses: actions/checkout@v4
+      - name: build cache files
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+          key: ${{ runner.os }}-depbuild-${{ matrix.config.id }}-build
+          restore-keys: ${{ runner.os }}-depbuilt-${{ matrix.config.id }}-build
       - name: Setup Environment
         run: |
           if [[ ${{ matrix.config.os }} = ubuntu* ]]; then
