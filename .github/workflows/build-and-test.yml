@@ -619,6 +619,7 @@ jobs:
             unit_tests: true
             functional_tests: true
             test_runner_extra: "--coverage --all  --exclude feature_dbcrash"
+            PARAMS_DIR: ${{ github.workspace }}/.pivx-params
     steps:
       - name: Get Source
         uses: actions/checkout@v4
@@ -655,6 +656,7 @@ jobs:
         run: |
           cd build/pivx-${{ matrix.config.host }}/
           if [ "${{ matrix.config.functional_tests }}" = "true" ]; then
+          ./params/install-params.sh $PARAMS_DIR
           echo ::group::Functional-Tests
           test/functional/test_runner.py --combinedlogslen=4000 ${{ matrix.config.test_runner_extra }}
           echo ::endgroup::
