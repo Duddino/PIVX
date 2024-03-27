@@ -638,6 +638,7 @@ jobs:
           restore-keys: ${{ runner.os }}-depends-${{ matrix.config.host }}
       - name: Run functional tests
         run: |
+          cd build/pivx-${{ matrix.config.host }}/
           if [ "${{ matrix.config.functional_tests }}" = "true" ]; then
           echo ::group::Functional-Tests
           test/functional/test_runner.py --combinedlogslen=4000 ${{ matrix.config.test_runner_extra }}
