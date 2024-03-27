@@ -612,8 +612,6 @@ jobs:
             functional_tests: true
             test_runner_extra: "--coverage --all  --exclude feature_dbcrash"
     steps:
-      - name: Get Source
-        uses: actions/checkout@v4
       - name: Setup Environment
         run: |
           if [[ ${{ matrix.config.os }} = ubuntu* ]]; then
