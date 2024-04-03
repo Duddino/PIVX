@@ -279,18 +279,104 @@ jobs:
             echo ::endgroup::
           fi
 
+  test_native_wallet:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    needs: [lint, build_native_wallet]
+    env:
+      APT_BASE: ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_SIZE: 500M
+      CCACHE_COMPRESS: 1
+      PARAMS_DIR: ${{ github.workspace }}/.pivx-params
+      WINEDEBUG: fixme-all
+      BOOST_TEST_RANDOM: 1 # random seed based on the current time
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        - name: x64-Linux
+          id: Linux-x86_64-nodepends
+          os: ubuntu-20.04
+          apt_get: python3-zmq qtbase5-dev qttools5-dev-tools libqt5svg5-dev libqt5charts5-dev libevent-dev bsdmainutils libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-test-dev libboost-thread-dev libdb5.3++-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev libqrencode-dev libgmp-dev libsodium-dev cargo
+          unit_tests: true
+          functional_tests: true
+          goal: install
+          BITCOIN_CONFIG: "--enable-zmq --enable-debug --with-incompatible-bdb --with-gui=qt5 CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER'"
+          
+        - name: x64-Linux-latest
+          id: Linux-x86_64-nodepends-latest
+          os: ubuntu-latest
+          apt_get: python3-zmq qtbase5-dev qttools5-dev-tools libqt5svg5-dev libqt5charts5-dev libevent-dev bsdmainutils libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-test-dev libboost-thread-dev libdb5.3++-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev libqrencode-dev libgmp-dev libsodium-dev cargo
+          unit_tests: true
+          functional_tests: true
+          goal: install
+          BITCOIN_CONFIG: "--enable-zmq --enable-debug --with-incompatible-bdb --with-gui=qt5 CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER'"
+          
+        - name: x64-macOS
+          id: macOS-nodepends
+          os: macos-11
+          brew_install: autoconf automake ccache berkeley-db@4 libtool boost@1.76 miniupnpc libnatpmp pkg-config python@3.8 libevent qrencode gmp libsodium rust librsvg
+          unit_tests: true
+          functional_tests: true
+          cc: clang
+          cxx: clang++
+          BITCOIN_CONFIG: "--enable-zmq --enable-gui --enable-reduce-exports --enable-werror --enable-debug --with-boost=/usr/local/opt/boost@1.76"
+          
+        - name: x64-macOS-latest
+          id: macOS-nodepends-latest
+          os: macos-latest
+          brew_install: autoconf automake ccache berkeley-db@4 libtool boost@1.76 miniupnpc libnatpmp pkg-config python@3.8 qt@5 zmq libevent qrencode gmp libsodium rust librsvg
+          unit_tests: true
+          functional_tests: true
+          goal: deploy
+          cc: clang
+          cxx: clang++
+          BITCOIN_CONFIG: "--enable-zmq --enable-gui --enable-reduce-exports --enable-werror --enable-debug --with-boost=/usr/local/opt/boost@1.76"
+    steps:
+      - name: Get Source
+        uses: actions/checkout@v4
+      - name: build cache files
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+          key: ${{ runner.os }}-depbuild-${{ matrix.config.id }}-build
+          restore-keys: ${{ runner.os }}-depbuilt-${{ matrix.config.id }}-build
+      - name: Setup Environment
+        run: |
+          if [[ ${{ matrix.config.os }} = ubuntu* ]]; then
+          sudo apt-add-repository "ppa:ondrej/php" -y
+          sudo apt-get --yes update
+          sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" ${{ matrix.config.apt_get }}
+          fi
+          if [[ ${{ matrix.config.os }} = macos* ]]; then
+          brew install ${{ matrix.config.brew_install }}
+          pip3.8 install ds_store mac_alias
+          fi
+      - name: Install params
+        run: |
+          cd build/pivx-${{ matrix.config.host }}/
+          ./params/install-params.sh $PARAMS_DIR
+      - name: Run unit tests
+        run: |
+          cd build/pivx-${{ matrix.config.host }}/
           if [ "${{ matrix.config.unit_tests }}" = "true" ]; then
             echo ::group::Unit-Tests
             make -j2 check VERBOSE=1
             echo ::endgroup::
           fi
-
+      - name: Run functional tests
+        run: |
+          cd build/pivx-${{ matrix.config.host }}/
           if [ "${{ matrix.config.functional_tests }}" = "true" ]; then
             echo ::group::Functional-Tests
             test/functional/test_runner.py --combinedlogslen=4000 ${{ matrix.config.test_runner_extra }}
             echo ::endgroup::
           fi
-
+    
   build_depends:
     name: Depends-${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -651,7 +737,6 @@ jobs:
           brew install ${{ matrix.config.brew_install }}
           pip3.8 install ds_store mac_alias
           fi
-
       - name: depends cache files
         if: matrix.config.no_depends != 1
         uses: actions/cache@v4
