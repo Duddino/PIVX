@@ -87,14 +87,6 @@ jobs:
             cc: gcc
             cxx: g++
 
-          - name: macOS
-            os: macos-11
-            packages: llvm@12 python@3.8 autoconf automake berkeley-db@4 libtool boost@1.76 miniupnpc libnatpmp pkg-config libevent qrencode gmp libsodium rust
-            no_qt: true
-            boost_root: true
-            cc: $(brew --prefix llvm@12)/bin/clang
-            cxx: $(brew --prefix llvm@12)/bin/clang++
-
           - name: macOS-latest
             os: macos-latest
             packages: llvm@13 python@3.8 autoconf automake berkeley-db@4 libtool boost@1.76 miniupnpc libnatpmp pkg-config qt@5 zmq libevent qrencode gmp libsodium rust
@@ -185,16 +177,6 @@ jobs:
             functional_tests: true
             goal: install
             BITCOIN_CONFIG: "--enable-zmq --enable-debug --with-incompatible-bdb --with-gui=qt5 CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER'"
-
-          - name: x64-macOS
-            id: macOS-nodepends
-            os: macos-11
-            brew_install: autoconf automake ccache berkeley-db@4 libtool boost@1.76 miniupnpc libnatpmp pkg-config python@3.8 libevent qrencode gmp libsodium rust librsvg
-            unit_tests: true
-            functional_tests: true
-            cc: clang
-            cxx: clang++
-            BITCOIN_CONFIG: "--enable-zmq --enable-gui --enable-reduce-exports --enable-werror --enable-debug --with-boost=/usr/local/opt/boost@1.76"
 
           - name: x64-macOS-latest
             id: macOS-nodepends-latest
@@ -316,16 +298,6 @@ jobs:
             goal: install
             BITCOIN_CONFIG: "--enable-zmq --enable-debug --with-incompatible-bdb --with-gui=qt5 CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER'"
             
-          - name: x64-macOS
-            id: macOS-nodepends
-            os: macos-11
-            brew_install: autoconf automake ccache berkeley-db@4 libtool boost@1.76 miniupnpc libnatpmp pkg-config python@3.8 libevent qrencode gmp libsodium rust librsvg
-            unit_tests: true
-            functional_tests: true
-            cc: clang
-            cxx: clang++
-            BITCOIN_CONFIG: "--enable-zmq --enable-gui --enable-reduce-exports --enable-werror --enable-debug --with-boost=/usr/local/opt/boost@1.76"
-          
           - name: x64-macOS-latest
             id: macOS-nodepends-latest
             os: macos-latest
@@ -417,13 +389,6 @@ jobs:
             host: x86_64-unknown-linux-gnu
             apt_get: python3-zmq
             dep_opts: DEBUG=1
-
-          - name: macOS 10.12
-            os: ubuntu-20.04
-            host: x86_64-apple-darwin16
-            apt_get: cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev python3-setuptools
-            XCODE_VERSION: 11.3.1
-            XCODE_BUILD_ID: 11C505
 
     steps:
       - name: Get Source
@@ -536,18 +501,6 @@ jobs:
             test_runner_extra: "--coverage --all  --exclude feature_dbcrash"
             BITCOIN_CONFIG: "--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --disable-online-rust LDFLAGS=-static-libstdc++"
 
-          - name: macOS 10.12
-            id: macOS10.12
-            os: ubuntu-20.04
-            host: x86_64-apple-darwin16
-            apt_get: cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev python3-setuptools
-            XCODE_VERSION: 11.3.1
-            XCODE_BUILD_ID: 11C505
-            unit_tests: false
-            functional_tests: false
-            symbol_check: true
-            goal: deploy
-            BITCOIN_CONFIG: "--enable-gui --enable-reduce-exports --enable-werror --disable-online-rust"
 
     steps:
       - name: Get Source
