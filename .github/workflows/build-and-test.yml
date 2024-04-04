@@ -247,6 +247,13 @@ jobs:
           ./autogen.sh
           echo ::endgroup::
 
+            mkdir -p build && cd build
+            echo ::group::Distir
+            make distdir VERSION=${{ matrix.config.id }}
+            echo ::endgroup::
+
+              cd pivx-${{matrix.config.id}}
+            
           echo ::group::Configure
           ./configure --cache-file=config.cache $BITCOIN_CONFIG_ALL ${{ matrix.config.BITCOIN_CONFIG }} $PARAMS_FLAGS || ( cat config.log && false)
           echo ::endgroup
@@ -331,11 +338,11 @@ jobs:
           fi
       - name: Install params
         run: |
-          cd build/pivx-${{ matrix.config.host }}/
+          cd build/pivx-${{ matrix.config.id }}/
           ./params/install-params.sh $PARAMS_DIR
       - name: Run unit tests
         run: |
-          cd build/pivx-${{ matrix.config.host }}/
+          cd build/pivx-${{ matrix.config.id }}/
           if [ "${{ matrix.config.unit_tests }}" = "true" ]; then
             echo ::group::Unit-Tests
             make -j2 check VERBOSE=1
@@ -343,7 +350,7 @@ jobs:
           fi
       - name: Run functional tests
         run: |
-          cd build/pivx-${{ matrix.config.host }}/
+          cd build/pivx-${{ matrix.config.id }}/
           if [ "${{ matrix.config.functional_tests }}" = "true" ]; then
             echo ::group::Functional-Tests
             test/functional/test_runner.py --combinedlogslen=4000 ${{ matrix.config.test_runner_extra }}
