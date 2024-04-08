@@ -210,7 +210,6 @@ jobs:
         with:
           path: |
             .ccache
-            .pivx-params
           key: ${{ runner.os }}-${{ matrix.config.id }}-native-ccache
           restore-keys: ${{ runner.os }}-${{ matrix.config.id }}-native-ccache
 
@@ -267,6 +266,12 @@ jobs:
             ./params/install-params.sh $PARAMS_DIR
             echo ::endgroup::
           fi
+          tar xf pivx-${{matrix.config.id}}.tgz pivx-${{matrix.config.id}}
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-native-${{ matrix.config.id }}
+          path: build-native-${{ matrix.config.id }}.tgz
 
   test_native_wallet:
     name: ${{ matrix.config.name }}
