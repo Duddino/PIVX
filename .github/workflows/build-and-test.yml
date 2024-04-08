@@ -389,7 +389,7 @@ jobs:
           fi
           tar czvf ${{ runner.os }}-depends-${{ matrix.config.host }}.tgz depends/built depends/sdk-sources depends/${{ matrix.config.host }}
       - name: Upload depends
-        uses: actions/download-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-depends-${{ matrix.config.host }}
           path: ${{ runner.os }}-depends-${{ matrix.config.host }}.tgz
