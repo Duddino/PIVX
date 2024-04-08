@@ -272,6 +272,12 @@ jobs:
         with:
           name: build-native-${{ matrix.config.id }}
           path: build-native-${{ matrix.config.id }}.tgz
+      - name: Upload pivx params
+        uses: actions/upload-artifact@v4
+        with:
+          name: pivx-params-${{ matrix.config.id }}
+          path: .pivx-params
+
 
   test_native_wallet:
     name: ${{ matrix.config.name }}
@@ -323,13 +329,10 @@ jobs:
     steps:
       - name: Get Source
         uses: actions/checkout@v4
-      - name: build cache files
-        uses: actions/cache@v4
+      - name: Download build files
+        uses: actions/download-artifact@v4
         with:
-          path: |
-            build/
-          key: ${{ runner.os }}-depbuild-${{ matrix.config.id }}-build
-          restore-keys: ${{ runner.os }}-depbuilt-${{ matrix.config.id }}-build
+          name: build-native-${{ matrix.config.id }}
       - name: Setup Environment
         run: |
           if [[ ${{ matrix.config.os }} = ubuntu* ]]; then
@@ -341,6 +344,9 @@ jobs:
           brew install ${{ matrix.config.brew_install }}
           pip3.8 install ds_store mac_alias
           fi
+      - name: Uncompress build files
+        run: |
+          tar xvf build-native-${{ matrix.config.id }}.tgz
       - name: Install params
         run: |
           cd build/pivx-${{ matrix.config.id }}/
