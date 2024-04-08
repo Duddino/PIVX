@@ -458,11 +458,11 @@ jobs:
             make -j2 -C depends HOST=${{ matrix.config.host }} ${{ matrix.config.dep_opts }}
           fi
           tar -czvf depends.tgz depends/built depends/sdk-sources depends/${{matrix.config.host}}
-     - name: Upload dependencies
-       uses: actions/upload-artifact@v4
-       with:
-         name: depends-${{matrix.config.host}}
-         path: depends.tgz
+      - name: Upload dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: depends-${{matrix.config.host}}
+          path: depends.tgz
 
   build_depends_wallet:
     name: ${{ matrix.config.name }}
