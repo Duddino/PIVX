@@ -387,6 +387,12 @@ jobs:
           if [ -z "${{ matrix.config.no_depends }}" ]; then
             make -j2 -C depends HOST=${{ matrix.config.host }} ${{ matrix.config.dep_opts }}
           fi
+          tar czvf ${{ runner.os }}-depends-${{ matrix.config.host }}.tgz depends/built depends/sdk-sources depends/${{ matrix.config.host }}
+      - name: Upload depends
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ runner.os }}-depends-${{ matrix.config.host }}
+          path: ${{ runner.os }}-depends-${{ matrix.config.host }}.tgz
 
   build_depends_wallet:
     name: ${{ matrix.config.name }}
@@ -491,17 +497,13 @@ jobs:
             pip3.8 install ds_store mac_alias
           fi
 
-      - name: depends cache files
-        if: matrix.config.no_depends != 1
-        uses: actions/cache@v4
+      - name: Download depends
+        uses: actions/download-artifact@v4
         with:
-          path: |
-            depends/built
-            depends/sdk-sources
-            depends/${{ matrix.config.host }}
-          key: ${{ runner.os }}-depends-${{ matrix.config.host }}
-          restore-keys: ${{ runner.os }}-depends-${{ matrix.config.host }}
-
+          name: ${{ runner.os }}-depends-${{ matrix.config.host }}
+      - name: Decompress depends
+        run: |
+          tar xvf  ${{ runner.os }}-depends-${{ matrix.config.host }}.tgz
       - name: ccache cache files
         uses: actions/cache@v4
         with:
